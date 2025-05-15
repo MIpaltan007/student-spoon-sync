@@ -16,18 +16,39 @@ import { Label } from "@/components/ui/label";
 import { MockMenuData } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 
+// Define types for our menu data
+interface MenuItem {
+  name: string;
+  description?: string;
+  vegetarian: boolean;
+  calories?: number | string;
+}
+
+interface MealType {
+  breakfast: MenuItem[];
+  lunch: MenuItem[];
+  dinner: MenuItem[];
+}
+
+interface MenuData {
+  [key: string]: MealType;
+}
+
 const MenuManagement = () => {
   const [selectedDay, setSelectedDay] = useState("Monday");
   const [selectedMealType, setSelectedMealType] = useState("breakfast");
   const { toast } = useToast();
   const days = Object.keys(MockMenuData);
 
-  const [menuItems, setMenuItems] = useState({
+  const [menuItems, setMenuItems] = useState<MenuItem>({
     name: "",
     description: "",
     vegetarian: true,
     calories: "",
   });
+
+  // Type assertion to help TypeScript understand the structure
+  const typedMenuData = MockMenuData as MenuData;
 
   const handleAddItem = () => {
     if (!menuItems.name) {
@@ -111,7 +132,7 @@ const MenuManagement = () => {
               <h3 className="font-medium mt-6 mb-4">2. Current Menu Items</h3>
               <div className="border rounded-md p-4 max-h-64 overflow-y-auto">
                 <ul className="space-y-3">
-                  {MockMenuData[selectedDay][selectedMealType as keyof typeof MockMenuData[string]].map((item, idx) => (
+                  {typedMenuData[selectedDay][selectedMealType as keyof MealType].map((item, idx) => (
                     <li key={idx} className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">{item.name}</p>
@@ -206,7 +227,7 @@ const MenuManagement = () => {
                       <div key={meal} className="border rounded-md p-3">
                         <h5 className="font-medium capitalize mb-2">{meal}</h5>
                         <ul className="space-y-2">
-                          {MockMenuData[day][meal as keyof typeof MockMenuData[string]].map((item, idx) => (
+                          {typedMenuData[day][meal as keyof MealType].map((item, idx) => (
                             <li key={idx} className="text-sm">
                               <div className="flex items-center">
                                 <span>{item.name}</span>
